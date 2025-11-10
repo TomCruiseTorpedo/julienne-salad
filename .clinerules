@@ -1,0 +1,164 @@
+# Cline Rules for SR&ED GPT Project
+
+## Project Identity
+**Project:** SR&ED GPT - Canadian R&D Tax Credit Copilot MVP
+**Domain:** AI/ML for tax compliance automation
+**Tech Stack:** DeepSeek R1 Distill Qwen 1.5B Q6 K L, Ollama, Easy OCR
+**Runtime:** Local execution only
+
+---
+
+## AI Development Context
+
+### Reference Material
+- **Global Memory Bank:** `/Users/jj/.cline/memory.md` - Contains system setup, version management, safety protocols
+- **Global Safety Rules:** `/Users/jj/.clinerules/` - Automatic safety enforcement across all sessions
+- **Project Memory:** See `.cline/memory.md` in this directory for project-specific context
+
+### Model Selection
+- **Default:** Claude 4.5 Sonnet (required for complex reasoning at high context usage)
+- **Avoid:** Claude Haiku at >60% context (prone to XML formatting errors and hallucinations)
+- **Strategy:** Escalate to Sonnet at 75%+ context usage
+
+---
+
+## Safety Protocols
+
+### Tool Execution Discipline
+- **One tool per message:** Multiple tools in single message always fail
+- **Wait for confirmation:** Verify each tool result before proceeding
+- **XML validation:** Check tag formatting before every execute_command or write_to_file
+- **No nested tags:** Never use function_calls wrappers or markdown backticks around tool tags
+
+### Context Management
+- **Monitor usage:** Watch progress bar during session
+- **75-80% threshold:** Dangerous zone - consider /newtask or model upgrade
+- **Use /smol:** Request compact responses when approaching limits
+- **Verify aggressively:** Every tool result must be explicitly confirmed
+
+### File Operations
+- **write_to_file:** Always provide complete final content
+- **replace_in_file:** Match content exactly including whitespace
+- **Search/Replace blocks:** List in order they appear in file
+- **Auto-formatting:** Use final_file_content as reference for next edits
+
+---
+
+## Project-Specific Guidelines
+
+### Tech Stack Rules
+1. **Ollama Integration**
+   - Models stored in ollama_models/ (gitignored)
+   - DeepSeek R1 Distill Qwen 1.5B Q6 K L as primary model
+   - All inference local only (no cloud APIs)
+
+2. **Easy OCR Usage**
+   - Output artifacts in ocr_output/ (gitignored)
+   - Support multiple document formats (PDFs, images, scans)
+   - Error handling for low-quality documents
+
+3. **Python Environment**
+   - Python 3.12.11 (enforced from global setup)
+   - Use venv for project isolation
+   - Lock dependencies with requirements.txt (prefer pip freeze)
+
+### SR&ED Domain Context
+- Compliance: Ensure narratives meet CRA SR&ED program requirements
+- Artifacts: Work with commits, tickets, chat logs, technical documentation
+- Output: Transform technical work into tax-compliant narratives
+- Domain knowledge: Familiarize with SR&ED eligibility criteria and documentation standards
+
+### Development Workflow
+1. All code changes tracked in git with atomic commits
+2. Features developed in feature branches (feature/*, bugfix/*, docs/*)
+3. Main branch always production-ready
+4. Document architectural decisions in .cline/memory.md
+5. Update README.md as project evolves
+
+---
+
+## Cline Tool Integration
+
+### Tool Availability
+- **All tools enabled** - No restrictions on tool use
+- **Preferred tools:** read_file, write_to_file, replace_in_file, execute_command, search_files
+- **Browser support:** browser_action available for web testing if needed
+- **MCP tools:** Available but not required for initial MVP
+
+### Common Commands for This Project
+```bash
+# Project setup
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Ollama integration
+ollama pull deepseek-r1:1.5b-q6_k_l
+
+# Running project
+python main.py
+python -m pytest
+
+# Git operations
+git add .
+git commit -m "message"
+git push origin feature-branch
+```
+
+---
+
+## Session Startup Checklist
+
+1. Check context usage percentage
+2. Review latest session summary from .cline/memory.md
+3. Verify version managers active (Python 3.12.11, Node 22.21.1)
+4. Confirm git remote points to https://github.com/TomCruiseTorpedo/julienne-salad
+5. Reference global memory bank for cross-project context
+
+---
+
+## Escalation Procedures
+
+### When Context Approaches 75%
+1. Use `/smol` for compact output
+2. Create summary of work completed so far
+3. Prepare `/newtask` context handoff if needed
+4. Switch to Claude Sonnet if using Haiku
+
+### When Stuck or Uncertain
+1. Check global memory bank first (`/Users/jj/.cline/memory.md`)
+2. Reference tech stack documentation (Ollama, Easy OCR, DeepSeek)
+3. Review project architecture in .cline/memory.md
+4. Ask clarifying questions using ask_followup_question tool
+
+### Security/Privacy Concerns
+- No API keys or credentials in code (use .env)
+- All LLM inference local (Ollama)
+- No external cloud calls allowed
+- Sanitize any external data (commits, tickets, chats)
+
+---
+
+## Documentation Standards
+
+### Code Comments
+- Include docstrings for functions (Python: Google/NumPy style)
+- Inline comments for complex logic
+- Mark TODOs clearly with GitHub issues reference
+
+### Git Commit Messages
+- Format: `type(scope): brief description`
+- Types: feat, fix, docs, refactor, test, chore
+- Example: `feat(ocr): add batch image processing capability`
+
+### Memory Bank Updates
+- Update .cline/memory.md when:
+  - Making architectural decisions
+  - Discovering new patterns or gotchas
+  - Completing major features
+  - Encountering bugs or limitations
+
+---
+
+## Last Updated
+2025-11-10, 2:55 PM - Initial project setup

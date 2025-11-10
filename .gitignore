@@ -67,6 +67,10 @@ logs/
 .coverage
 htmlcov/
 
+# Cline (local development only)
+.cline/
+.clinerules
+
 # Misc
 .pytest_cache/
 .mypy_cache/

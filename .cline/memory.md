@@ -99,6 +99,43 @@ Output & Review Layer
 
 ---
 
+## Local Development Setup (Machine-Specific)
+
+### Ollama Installation
+- **Installation Method:** Homebrew (system-wide)
+- **Command:** `ollama` available in PATH
+- **Status:** Already installed and ready for use
+
+### DeepSeek R1 Model Configuration
+- **Model Name:** DeepSeek-R1-Distill-Qwen-1.5B-Q6_K_L (GGUF format)
+- **Location:** Stored locally (see setup documentation)
+- **Configuration:** Point Ollama to use this specific model file for SR&ED GPT development
+- **Usage:** Load model before running development/testing sessions
+
+### Python Integration
+- **Client Library:** `ollama` (Python package for Ollama API interaction)
+- **Recommended Installation:** `pip install ollama` in project venv
+- **API Usage:** Connect to Ollama via default localhost:11434
+
+### Development Workflow with Ollama
+```bash
+# Start Ollama service (if not running)
+ollama serve
+
+# In separate terminal, test model availability
+ollama list
+
+# Load the DeepSeek model
+ollama pull <model_reference>
+
+# In Python code:
+from ollama import Client
+client = Client(host='localhost:11434')
+response = client.generate(model='deepseek-r1:1.5b-q6_k_l', prompt='...')
+```
+
+---
+
 ## Project Status & Timeline
 
 ### Current Phase: Initialization ✓
@@ -107,18 +144,20 @@ Output & Review Layer
 - [x] README placeholder created
 - [x] .clinerules established
 - [x] Memory bank initialized
-- [ ] Initial git commit
-- [ ] First push to GitHub
+- [x] Initial git commit
+- [x] First push to GitHub
+- [x] Ollama configuration documented
 
 ### Next Phases (TBD)
-- [ ] Phase 1: Core architecture & Ollama integration
-- [ ] Phase 2: Document parsing & OCR pipeline
-- [ ] Phase 3: Artifact ingestion layer
-- [ ] Phase 4: Narrative generation engine
-- [ ] Phase 5: SR&ED compliance validation
-- [ ] Phase 6: UI/UX layer
-- [ ] Phase 7: Testing & optimization
-- [ ] Phase 8: MVP launch
+- [ ] Phase 1: Core architecture & Ollama client integration
+- [ ] Phase 2: Document parsing & Easy OCR pipeline
+- [ ] Phase 3: Artifact ingestion layer (commits, tickets, chats)
+- [ ] Phase 4: Context aggregation & preprocessing
+- [ ] Phase 5: Narrative generation engine (DeepSeek R1)
+- [ ] Phase 6: SR&ED compliance validation
+- [ ] Phase 7: Output formatting & review UI
+- [ ] Phase 8: Testing & optimization
+- [ ] Phase 9: MVP launch
 
 ---
 
@@ -191,7 +230,21 @@ Before starting work:
 
 ---
 
-## Last Updated
-2025-11-10, 2:56 PM - Initial project setup and memory bank creation
+---
 
-**Next Update:** When architecture decisions finalized or after Phase 1 completion
+## Development Session Checklist (Ollama-Specific)
+
+Before starting development:
+1. [ ] Verify Python 3.12.11 active: `python --version`
+2. [ ] Confirm Ollama service running or ready: `ollama list`
+3. [ ] Check that DeepSeek model is accessible
+4. [ ] Create/activate project venv: `source venv/bin/activate`
+5. [ ] Install ollama Python package: `pip install ollama`
+6. [ ] Verify connection to Ollama API: `python -c "from ollama import Client; Client().generate(model='deepseek-r1:1.5b-q6_k_l', prompt='test')"` 
+
+---
+
+## Last Updated
+2025-11-10, 3:01 PM - Added local development setup and Ollama configuration
+
+**Next Update:** When Phase 1 architecture decisions are finalized

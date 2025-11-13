@@ -4,6 +4,7 @@ import easyocr
 from PIL import Image
 import numpy as np
 import io
+from datetime import datetime
 
 # --- MODEL LOADING (CACHED) ---
 
@@ -144,6 +145,68 @@ QUALITY GUIDELINES:
         st.error(f"Error communicating with Ollama. Is the 'sred-expert' model running? Details: {e}")
         return ""
 
+def format_narrative_output(raw_output: str) -> tuple[str, str]:
+    """
+    Splits the raw narrative into thinking process and formatted output.
+    Returns: (thinking_process, formatted_narrative)
+    """
+    # Split by the first occurrence of "## Line 242" to separate thinking from output
+    lines = raw_output.split("\n")
+    thinking_lines = []
+    narrative_lines = []
+    in_narrative = False
+    
+    for line in lines:
+        if "## Line 242" in line:
+            in_narrative = True
+        
+        if in_narrative:
+            narrative_lines.append(line)
+        else:
+            thinking_lines.append(line)
+    
+    thinking_text = "\n".join(thinking_lines).strip()
+    narrative_text = "\n".join(narrative_lines).strip()
+    
+    # Enhance formatting: add bullets and structure
+    formatted_narrative = enhance_narrative_formatting(narrative_text)
+    
+    return thinking_text, formatted_narrative
+
+def enhance_narrative_formatting(narrative: str) -> str:
+    """
+    Enhances narrative formatting with bullets, bold text, and clearer section separation.
+    """
+    formatted = narrative.replace("**", "**")  # Preserve bold
+    # Add more visual separation
+    formatted = formatted.replace("## Line 242", "\n---\n## 📋 Line 242: Technological Uncertainty\n---")
+    formatted = formatted.replace("## Line 244", "\n---\n## 📋 Line 244: Systematic Investigation\n---")
+    formatted = formatted.replace("## Line 246", "\n---\n## 📋 Line 246: Technological Advancement\n---")
+    
+    return formatted
+
+def process_multiple_inputs(source_texts: list[str], mode: str) -> str:
+    """
+    Process multiple input texts based on user preference.
+    mode: "combined" or "separate"
+    """
+    if mode == "combined":
+        # Merge all texts into one context
+        combined_text = "\n\n---\n\n".join(source_texts)
+        return generate_narrative_local(combined_text)
+    else:
+        # Generate separate narratives and combine them
+        narratives = []
+        for i, text in enumerate(source_texts, 1):
+            st.write(f"Processing input {i}/{ len(source_texts)}...")
+            narrative = generate_narrative_local(text)
+            narratives.append(f"### Narrative {i}\n\n{narrative}")
+        return "\n\n---\n\n".join(narratives)
+
+# --- SESSION STATE INITIALIZATION ---
+if 'history' not in st.session_state:
+    st.session_state.history = []
+
 # --- UI & APPLICATION LOGIC ---
 
 st.set_page_config(layout="wide", page_title="SR&ED GPT", page_icon="🍁")
@@ -153,13 +216,31 @@ st.subheader("Your AI Co-pilot for Canadian R&D Tax Credits")
 # Load the OCR reader at the start
 reader = load_ocr_reader()
 
+# --- SIDEBAR: SESSION HISTORY ---
+with st.sidebar:
+    st.header("📚 Session History")
+    if st.session_state.history:
+        st.write(f"**Generated Narratives:** {len(st.session_state.history)}")
+        for i, item in enumerate(st.session_state.history, 1):
+            with st.expander(f"📄 Result {i} - {item['timestamp']}"):
+                st.text_area("View narrative", value=item['output'], height=200, disabled=True)
+                st.download_button(
+                    label=f"Download Result {i}",
+                    data=item['output'],
+                    file_name=f"sred_narrative_{i}_{item['timestamp'].replace(':', '-')}.txt",
+                    key=f"download_{i}"
+                )
+    else:
+        st.info("💡 Generated narratives will appear here during your session.")
+
+# --- MAIN CONTENT ---
 col1, col2 = st.columns(2)
 
 with col1:
     st.header("1. Provide Your Technical Data")
     
     # Using tabs for different input methods
-    input_tab1, input_tab2 = st.tabs(["📄 Paste Text", "📸 Upload Image"])
+    input_tab1, input_tab2 = st.tabs(["📄 Paste Text", "📸 Upload Image(s)"])
 
     with input_tab1:
         user_input_text = st.text_area(
@@ -169,46 +250,87 @@ with col1:
         )
     
     with input_tab2:
-        uploaded_file = st.file_uploader(
-            "Upload a screenshot, diagram, or document", 
+        st.write("**Upload one or more images:**")
+        uploaded_files = st.file_uploader(
+            "Select image(s) to upload", 
             type=['png', 'jpg', 'jpeg'],
+            accept_multiple_files=True,
             help="Upload images of git logs, architecture diagrams, or project tickets"
         )
+        
+        # Processing preference for multiple images
+        if uploaded_files and len(uploaded_files) > 1:
+            st.write("**How should multiple images be processed?**")
+            process_mode = st.radio(
+                "Processing mode:",
+                ["combined", "separate"],
+                format_func=lambda x: "Combined Context (one narrative)" if x == "combined" else "Separate Narratives (one per image)",
+                key="process_mode"
+            )
+        else:
+            process_mode = "combined"
 
     if st.button("🚀 Generate SR&ED Narrative", type="primary", use_container_width=True):
-        source_text = ""
+        source_texts = []
         
+        # Collect text input
         if user_input_text:
-            source_text = user_input_text
-        elif uploaded_file is not None:
-            with st.spinner("📖 Reading image with EasyOCR..."):
-                image = Image.open(uploaded_file).convert('RGB')
-                image_np = np.array(image)
-                results = reader.readtext(image_np)
-                source_text = "\n".join([result[1] for result in results])
-                
-                # Show extracted text in an expander
-                with st.expander("📝 Extracted Text from Image"):
-                    st.text(source_text)
+            source_texts.append(user_input_text)
+        
+        # Collect image inputs
+        if uploaded_files:
+            with st.spinner("📖 Reading images with EasyOCR..."):
+                for uploaded_file in uploaded_files:
+                    image = Image.open(uploaded_file).convert('RGB')
+                    image_np = np.array(image)
+                    results = reader.readtext(image_np)
+                    extracted = "\n".join([result[1] for result in results])
+                    source_texts.append(extracted)
+                    
+                    # Show extracted text in an expander
+                    with st.expander(f"📝 Extracted Text from {uploaded_file.name}"):
+                        st.text(extracted)
+        
+        if not source_texts:
+            st.warning("⚠️ Please paste text or upload image(s) first.")
         else:
-            st.warning("⚠️ Please paste text or upload an image first.")
-
-        if source_text:
             with col2:
                 st.header("2. AI-Generated SR&ED Narrative")
-                with st.spinner("🤖 Consulting the AI expert... (this may take 30-60 seconds)"):
-                    narrative_output = generate_narrative_local(source_text)
+                with st.spinner("🤖 Consulting the AI expert... (this may take 30-60 seconds per input)"):
+                    # Process inputs based on mode
+                    if len(source_texts) > 1:
+                        narrative_output = process_multiple_inputs(source_texts, process_mode)
+                    else:
+                        narrative_output = generate_narrative_local(source_texts[0])
                     
                     if narrative_output:
-                        st.markdown(narrative_output)
+                        # Split into thinking and narrative
+                        thinking_process, formatted_narrative = format_narrative_output(narrative_output)
                         
-                        # Add a download button for the generated narrative
+                        # Display thinking process in collapsible expander
+                        with st.expander("🤔 View AI's Thinking Process"):
+                            st.markdown(thinking_process)
+                        
+                        # Display formatted narrative prominently
+                        st.markdown("---")
+                        st.subheader("📋 SR&ED Narrative (Ready for CRA Submission)")
+                        st.markdown(formatted_narrative)
+                        
+                        # Download button
                         st.download_button(
                             label="💾 Download Narrative",
-                            data=narrative_output,
-                            file_name="sred_narrative.txt",
+                            data=formatted_narrative,
+                            file_name=f"sred_narrative_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
                             mime="text/plain"
                         )
+                        
+                        # Add to session history
+                        st.session_state.history.append({
+                            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                            'output': formatted_narrative,
+                            'input_count': len(source_texts)
+                        })
+                        st.success("✅ Narrative added to session history!")
                     else:
                         st.error("Failed to generate narrative. Check Ollama connection.")
 
@@ -217,15 +339,23 @@ with col2:
         st.header("2. AI-Generated Narrative")
         st.info("""
             **How to Use:**
-            1.  **Paste Text** or **Upload an Image** of your technical work.
-            2.  Click the **Generate** button.
-            3.  The AI will analyze the data and draft a technical narrative based on official SR&ED guidelines.
+            1. **Paste Text** or **Upload Image(s)** of your technical work.
+            2. For multiple images, choose how they should be processed.
+            3. Click the **Generate** button.
+            4. The AI will analyze the data and draft a technical narrative based on official SR&ED guidelines.
             
             **What the AI Does:**
             - Extracts technical information from your input
             - Identifies potential technological uncertainties
             - Structures the narrative according to T661 form requirements (Lines 242, 244, 246)
             - Generates professional, CRA-compliant language
+            - Provides formatted output ready for CRA submission
+            
+            **Features:**
+            - 🤔 View AI's thinking process (hidden by default for cleaner UI)
+            - 📝 Formatted narrative with clear sections
+            - 📚 Session history sidebar for quick access to past generations
+            - 💾 Download narratives for offline editing
             
             **Disclaimer:** This is an AI-powered tool for generating drafts. Always review and edit the output with a qualified SR&ED consultant before submission to the CRA.
         """)

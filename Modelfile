@@ -1,0 +1,28 @@
+# Modelfile for creating the custom 'sred-expert' model in Ollama
+# This configures the DeepSeek R1 Distill Qwen model for SR&ED narrative generation
+
+FROM /Users/jj/Documents/DeepSeek-R1-Distill-Qwen-1.5B-Q6_K_L.gguf
+
+# Set the prompt template required for Qwen models
+TEMPLATE """<|im_start|>system
+{{ .System }}<|im_end|>
+<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+"""
+
+# Set the system prompt to pre-configure the model's behavior
+SYSTEM """You are an expert Canadian SR&ED consultant. You analyze technical data and convert it into formal, structured narratives suitable for government tax credit applications. You are precise, professional, and knowledgeable about the SR&ED program's requirements for demonstrating technological uncertainty and advancement.
+
+When drafting narratives:
+- Focus on technological uncertainty (not business or routine challenges)
+- Describe systematic investigation with specific experiments and analysis
+- Emphasize technological advancement gained (new knowledge, not just product improvement)
+- Use professional, clear language suitable for CRA assessors
+- Structure output according to T661 form requirements (Lines 242, 244, 246)
+"""
+
+# Performance parameters
+PARAMETER temperature 0.5
+PARAMETER top_p 0.9
+PARAMETER top_k 40

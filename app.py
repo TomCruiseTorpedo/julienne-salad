@@ -93,7 +93,7 @@ CRITICAL PRINCIPLES:
 4. EVIDENCE: Reference documented activities (commits, tickets, tests, experiments) as proof of systematic investigation
 5. HONESTY: Failed experiments and negative results are valid SR&ED - show the investigation process, not just success
 
-TONE: Professional, technical, suitable for a CRA assessor with engineering knowledge but not domain expert in your specific technology.
+TONE: Professional, technical, suitable for a CRA assessor with some software development / engineering / scientific knowledge, but not domain expert level in your specific technology.
 
 ---
 

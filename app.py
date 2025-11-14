@@ -5,6 +5,7 @@ from PIL import Image
 import numpy as np
 import io
 from datetime import datetime
+import cv2
 
 # --- MODEL LOADING (CACHED) ---
 
@@ -281,15 +282,26 @@ with col1:
         if uploaded_files:
             with st.spinner("📖 Reading images with EasyOCR..."):
                 for uploaded_file in uploaded_files:
-                    image = Image.open(uploaded_file).convert('RGB')
-                    image_np = np.array(image)
-                    results = reader.readtext(image_np)
-                    extracted = "\n".join([result[1] for result in results])
-                    source_texts.append(extracted)
-                    
-                    # Show extracted text in an expander
-                    with st.expander(f"📝 Extracted Text from {uploaded_file.name}"):
-                        st.text(extracted)
+                    try:
+                        # Load image with PIL and convert to RGB first
+                        image = Image.open(uploaded_file).convert('RGB')
+                        # Convert PIL Image to numpy array (RGB format)
+                        image_rgb = np.array(image, dtype=np.uint8)
+                        # Convert RGB to BGR for OpenCV/EasyOCR compatibility
+                        image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+                        # Ensure the array is contiguous in memory
+                        image_bgr = np.ascontiguousarray(image_bgr)
+                        # Pass BGR image to EasyOCR
+                        results = reader.readtext(image_bgr)
+                        extracted = "\n".join([result[1] for result in results])
+                        source_texts.append(extracted)
+                        
+                        # Show extracted text in an expander
+                        with st.expander(f"📝 Extracted Text from {uploaded_file.name}"):
+                            st.text(extracted)
+                    except Exception as e:
+                        st.error(f"❌ Error processing {uploaded_file.name}: {str(e)}")
+                        continue
         
         if not source_texts:
             st.warning("⚠️ Please paste text or upload image(s) first.")

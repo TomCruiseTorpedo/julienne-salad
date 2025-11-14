@@ -1,7 +1,8 @@
 streamlit
 ollama
 easyocr
-numpy
+numpy<2
+opencv-python-headless<4.10.0
 Pillow
 torch
 torchvision

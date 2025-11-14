@@ -97,7 +97,7 @@ This is **not** a vector database or retrieval system—it's knowledge-as-prompt
 
 6. Open your browser to `http://localhost:8501`
 
-## 📖 Usage Guide
+## � Usage Guide
 
 ### Single-Input Workflow
 Best for: Quick narrative generation from a single project description or document
@@ -215,7 +215,7 @@ The system uses role-based prompting (expert tax advisor + technical architect).
 - Limit to 3-5 images per session
 - Solution: Process in batches if working with many documents
 
-## 🔧 Development
+## � Development
 
 ### Project Structure
 ```

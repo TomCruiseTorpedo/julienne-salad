@@ -1,241 +1,291 @@
-# SR&ED GPT - Canadian R&D Tax Credit Copilot MVP
+# SR&ED GPT - Automated Narrative Generation for Canadian R&D Tax Claims
 
-## Overview
+Struggling to articulate the technological uncertainty, systematic investigation, and advancement in your R&D work for Canada's Scientific Research and Experimental Development (SR&ED) program? SR&ED GPT is a locally-hosted AI assistant that generates high-quality, CRA-compliant narratives directly from your project documentation and code.
 
-A specialized AI co-pilot that ingests a company's technical artifacts (code commits, project tickets, chats) and transforms them into compliant, high-quality technical narratives for the Canadian SR&ED tax incentive program.
+**This is a hackathon MVP** built to solve a real pain point: translating technical work into the specific language and structure required by CRA's T661 form (Lines 242, 244, and 246). While not a substitute for professional claim preparation, it dramatically reduces the time spent on first drafts and ensures consistency in SR&ED terminology.
 
-**Core Value Proposition:** Demystifies and dramatically accelerates the SR&ED application process, converting hundreds of hours of high-cost engineering and administrative time into a few hours of review, maximizing claims and freeing up teams to focus on actual innovation.
+## 🎯 Key Features
 
----
+### v1.1 Enhancements
+- **Multiple Image Upload**: Submit project documentation, screenshots, and code snippets all at once. Choose between combined narratives (synthesized context) or separate narratives for each image.
+- **Session History**: All inputs, outputs, and formatting preferences persist within your session. No need to re-enter context across multiple queries.
+- **Advanced Output Formatting**: Outputs include the AI's thinking process (hidden by default) and a polished, CRA-ready narrative with explicit section mapping to T661 form lines.
 
-## Tech Stack
+### Core Capabilities
+- **Local LLM Integration**: Runs entirely on your machine using Ollama + DeepSeek R1 Distill Qwen (1.5B parameters). No cloud dependencies, no data sent elsewhere.
+- **OCR Support**: Extract text from documentation images automatically using EasyOCR.
+- **SR&ED-Specific Reasoning**: Embedded knowledge base patterns for technological uncertainty assessment, systematic investigation documentation, and advancement claims.
+- **Streamlined UI**: Simple, intuitive Streamlit interface with copy-to-clipboard formatting for CRA submission.
 
-- **Application Framework:** Streamlit (Python web UI)
-- **LLM Engine:** DeepSeek R1 Distill Qwen 1.5B Q6 K L (GGUF format)
-- **LLM Runtime:** Ollama (local model serving)
-- **OCR Library:** EasyOCR (text extraction from images)
-- **Language:** Python 3.12.11
-- **Architecture:** Local-first, stateless, privacy-focused
+## 🏗️ How It Works
 
----
+### Architecture Overview
 
-## Features
+```
+User Input (Text/Images)
+    ↓
+[Streamlit UI] ← Session State Management
+    ↓
+[Text Extraction] ← EasyOCR for images
+    ↓
+[Context Assembly] ← Multi-input processing
+    ↓
+[Ollama/DeepSeek] ← Local LLM inference
+    ↓
+[Output Formatting] ← Thinking + Narrative separation
+    ↓
+CRA-Ready Narrative Output
+```
 
-- 📄 **Dual Input Methods:** Paste text directly or upload images (screenshots, diagrams, tickets)
-- 🔍 **OCR Integration:** Automatically extracts text from technical documents using EasyOCR
-- 🤖 **AI-Powered Analysis:** Uses locally-run DeepSeek R1 model via Ollama for narrative generation
-- 📋 **T661 Form Alignment:** Structures output according to CRA form requirements (Lines 242, 244, 246)
-- 🔒 **Privacy-First:** All processing happens locally - no data leaves your machine
-- 💾 **Export Ready:** Download generated narratives for review and submission
-- ⚡ **Cached Performance:** EasyOCR loads once and stays in memory for fast processing
+### Processing Pipeline
 
----
+1. **Input Ingestion**: Users provide text descriptions and/or project documentation images
+2. **Image Processing**: Images are processed with EasyOCR to extract text content
+3. **Context Aggregation**: Multiple inputs (text + extracted text) are intelligently combined based on user preference
+4. **LLM Inference**: Local DeepSeek model generates narratives with explicit reasoning about SR&ED criteria (uncertainty, investigation, advancement)
+5. **Output Formatting**: Results are split into:
+   - **Thinking Process**: Raw reasoning (useful for understanding the AI's assessment)
+   - **Polished Narrative**: CRA-submission-ready text with T661 form section mapping
 
-## Setup Instructions
+### SR&ED Knowledge Integration
+
+The system uses embedded prompt patterns that:
+- Guide the AI to identify technological uncertainty vs. normal engineering
+- Document systematic investigation methodologies
+- Articulate technological advancement relative to industry standards
+- Map narrative content to specific CRA T661 form lines (242, 244, 246)
+
+This is **not** a vector database or retrieval system—it's knowledge-as-prompts, ensuring deterministic and transparent reasoning.
+
+## 🚀 Quick Start
 
 ### Prerequisites
+- **Python 3.12.11** (required)
+- **Ollama** installed and running locally ([Get Ollama](https://ollama.ai))
+- **DeepSeek R1 Distill Qwen model** loaded (`ollama pull deepseek-r1:1.5b`)
+- **GPU recommended** (for faster inference, though CPU works fine for MVP)
 
-- **Python 3.12.11** (verify with `python --version`)
-- **Ollama** installed via Homebrew: `brew install ollama`
-- **DeepSeek R1 Model File:** DeepSeek-R1-Distill-Qwen-1.5B-Q6_K_L.gguf (GGUF format)
+### Installation
 
-### Step 1: Clone the Repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/TomCruiseTorpedo/julienne-salad.git
+   cd julienne-salad
+   ```
 
-```bash
-git clone https://github.com/TomCruiseTorpedo/julienne-salad.git
-cd julienne-salad
-```
+2. Create a virtual environment:
+   ```bash
+   python3.12 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-### Step 2: Create Python Virtual Environment
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```bash
-python3.12 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+4. Ensure Ollama is running:
+   ```bash
+   ollama serve
+   ```
+   (In another terminal, pull the model if needed: `ollama pull deepseek-r1:1.5b`)
 
-### Step 3: Install Dependencies
+5. Launch the app:
+   ```bash
+   streamlit run app.py
+   ```
 
-```bash
-pip install -r requirements.txt
-```
+6. Open your browser to `http://localhost:8501`
 
-**Note:** EasyOCR will automatically install PyTorch. First run may take several minutes to download OCR models (~100MB).
+## 📖 Usage Guide
 
-### Step 4: Create Custom Ollama Model
+### Single-Input Workflow
+Best for: Quick narrative generation from a single project description or document
 
-The `Modelfile` in this repository configures the DeepSeek R1 model specifically for SR&ED narrative generation.
+1. Enter your project context in the text area (or paste code snippets, project summaries, etc.)
+2. Click **"Generate SR&ED Narrative"**
+3. Review the output (thinking + polished narrative)
+4. Copy the narrative for submission
 
-```bash
-# Create the custom 'sred-expert' model
-ollama create sred-expert -f ./Modelfile
-```
+### Multi-Image Workflow (v1.1)
+Best for: Complex projects documented across multiple sources (design docs, code screenshots, test reports)
 
-**Verify the model was created:**
-```bash
-ollama list
-# Should show 'sred-expert' in the list
-```
+1. Upload multiple images using the file uploader
+2. Optionally add supplementary text context
+3. Select preference:
+   - **Combined**: Single unified narrative synthesizing all inputs (recommended for large contexts)
+   - **Separate**: Individual narratives for each image (useful for modular projects)
+4. Click **"Generate SR&ED Narrative"**
+5. Review outputs and copy as needed
 
-### Step 5: Run the Application
+### Session History
+All inputs, outputs, and user preferences are saved within your session:
+- Switch between different projects without losing history
+- Refine narratives iteratively based on feedback
+- Session clears when you restart the app
 
-```bash
-streamlit run app.py
-```
+## 📋 Understanding the Output
 
-The app will open in your default browser at `http://localhost:8501`
+### T661 Form Mapping
 
----
+The AI's output is structured to address three critical CRA requirements:
 
-## Usage
+**Line 242 - Technological Uncertainty**
+- Identifies gaps in knowledge or technical challenges that weren't readily deducible
+- Explains why the problem wasn't a routine engineering task
 
-### Quick Start
+**Line 244 - Work Performed**
+- Documents the systematic investigation: hypotheses tested, methodologies used, experiments conducted
+- Shows the breadth and depth of R&D activity
 
-1. **Start the app:** `streamlit run app.py`
-2. **Choose input method:**
-   - **Paste Text:** Enter git logs, Jira tickets, or technical notes directly
-   - **Upload Image:** Upload screenshots of commits, diagrams, or project tickets
-3. **Generate Narrative:** Click "🚀 Generate SR&ED Narrative"
-4. **Review Output:** AI-generated narrative appears with structured sections
-5. **Download:** Use "💾 Download Narrative" button to save for review
+**Line 246 - Technological Advancement**
+- Articulates what new technology or capability was achieved
+- Connects to industry context and improvement over prior art
 
-### Input Examples
+### Output Structure
 
-**Git Log (Paste Text):**
-```
-feat(parser): Implement recursive descent parser for new syntax
-fix(lexer): Correctly handle escaped characters in strings
-perf(parser): Memoize parsing results to improve performance by 40%
-```
+Each narrative output includes:
 
-**Architecture Diagram (Upload Image):**
-- Screenshot showing system components
-- Include annotations about technical challenges
-- Notes on uncertainties or experiments
+1. **Thinking Process**: Raw reasoning from the AI model (hidden by default)
+   - Use this to understand assessment logic and catch errors
+   - Reference when preparing claim details with tax professionals
 
-**Jira Ticket (Upload Image or Paste):**
-- Technical investigation stories
-- Research spikes with clear uncertainty
-- Experiment descriptions and results
+2. **Polished Narrative**: CRA-submission-ready text
+   - Clear, concise language aligned with SR&ED terminology
+   - Implicit section mapping to Lines 242/244/246
+   - Ready to copy-paste into CRA forms or claim documents
 
-### Understanding the Output
+## ⚙️ Advanced Features
 
-The AI generates three key sections aligned with T661 form requirements:
+### Customization via Prompts
+The system uses role-based prompting (expert tax advisor + technical architect). Modify `app.py` to adjust:
+- Formality level
+- Technical depth
+- SR&ED terminology emphasis
+- Claim conservatism
 
-**Line 242: Technological Uncertainty**
-- Describes what couldn't be solved with standard practice
-- Identifies the core technical challenge
+### Local LLM Benefits
+- **Privacy**: No data leaves your machine
+- **Control**: Adjust model parameters, inference settings
+- **Cost**: No API fees for unlimited queries
+- **Offline**: Works without internet after initial model download
 
-**Line 244: Work Performed**
-- Details the systematic investigation
-- Lists experiments, tests, and analysis conducted
+### Performance Tuning
+- **CPU Mode**: 2-5 minutes per narrative (1.5B model)
+- **GPU Mode**: 30-60 seconds per narrative (recommended)
+- Adjust Ollama settings for your hardware in `~/.ollama/ollamarc`
 
-**Line 246: Technological Advancement**
-- Explains new knowledge gained
-- Shows how underlying technology was advanced
+## 🐛 Troubleshooting
 
----
+### "Connection refused" / Ollama not found
+**Problem**: Streamlit can't reach Ollama server
+- Verify Ollama is running: `ollama list` in another terminal
+- Check Ollama is on default port 11434
+- Solution: Restart Ollama with `ollama serve`
 
-## Project Structure
+### "Model not found" / sred-expert model missing
+**Problem**: DeepSeek model not loaded locally
+- Pull the model: `ollama pull deepseek-r1:1.5b`
+- Verify it's available: `ollama list`
+- Solution: The app will auto-pull if configured, or manually pull before starting
 
+### OCR errors or empty text extraction
+**Problem**: Images not processing correctly
+- Verify image quality (clear, high contrast text)
+- Check image format (JPEG, PNG, BMP supported)
+- Logs show extraction details for debugging
+- Solution: Pre-process poor-quality images or provide text manually
+
+### Slow inference / hanging on generation
+**Problem**: App stalled during narrative generation
+- Check system resources (CPU/memory) with Activity Monitor
+- For CPU-only systems, expect 2-5 min per narrative
+- Verify model loaded: `ollama list`
+- Solution: Consider GPU acceleration if available, or increase system resources
+
+### Python version mismatch
+**Problem**: "Python 3.12.11 required" error
+- Verify Python version: `python --version`
+- Check virtual environment activation
+- Solution: Install Python 3.12.11 or update dependencies for compatible version
+
+### Memory issues with large images
+**Problem**: App crashes with large uploaded files
+- Resize images before upload (recommend < 5MB)
+- Limit to 3-5 images per session
+- Solution: Process in batches if working with many documents
+
+## 🔧 Development
+
+### Project Structure
 ```
 julienne-salad/
-├── app.py                    # Main Streamlit application
-├── Modelfile                 # Ollama model configuration
-├── requirements.txt          # Python dependencies
-├── research/                 # SR&ED research materials
-│   ├── source_material.md    # Prompting guide and examples
-│   ├── official_references.md # CRA T4088 & T661 documentation
-│   └── example_narratives.md # High-quality example collection
-└── demo_assets/              # Demo presentation materials
-    └── README.md             # Specifications for hero assets
+├── app.py                 # Main Streamlit application
+├── requirements.txt       # Python dependencies
+├── README.md             # This file
+├── Modelfile             # Ollama custom model configuration
+├── .streamlit/
+│   └── config.toml       # Streamlit configuration
+└── .gitignore            # Excludes private docs, cache, LLM models
 ```
 
----
+### Dependencies
+- **streamlit**: UI framework
+- **ollama**: Local LLM interface
+- **easyocr**: Image-to-text extraction
+- **pillow**: Image processing
+- **numpy**: Numerical operations
 
-## Architecture Notes
-
-### "Poor Man's RAG" Approach
-
-For the MVP, we use hardcoded CRA guidelines directly in the prompt rather than a vector database. This keeps the architecture simple while providing context-aware generation.
-
-**Future Enhancement:** Implement proper RAG with ChromaDB for dynamic retrieval of T4088 guide sections.
-
-### SR&ED Eligibility Criteria
-
-Your work qualifies for SR&ED if it meets three criteria:
-
-1. **Technological Advancement:** Sought to achieve scientific/technological advancement
-2. **Technological Uncertainty:** Had uncertainty that couldn't be resolved through routine engineering
-3. **Systematic Investigation:** Followed a methodical process of experimentation and analysis
-
-**Common Pitfalls:**
-- ❌ Routine debugging or standard engineering
-- ❌ Business uncertainty without technical challenge
-- ❌ Product improvements without underlying tech advancement
-
----
-
-## Troubleshooting
-
-### "Error communicating with Ollama"
-
-**Solution:** Ensure Ollama service is running and the model is created:
-```bash
-# Check if Ollama is running
-ollama list
-
-# If 'sred-expert' is missing, create it
-ollama create sred-expert -f ./Modelfile
-
-# Test the model directly
-ollama run sred-expert "Test prompt"
-```
-
-### EasyOCR Installation Issues
-
-**Solution:** If PyTorch installation fails, try installing it separately first:
-```bash
-pip install torch torchvision
-pip install -r requirements.txt
-```
-
-### Streamlit Won't Start
-
-**Solution:** Verify Python version and virtual environment:
-```bash
-python --version  # Should be 3.12.11
-which python      # Should point to venv/bin/python
-```
-
----
-
-## Development
-
-### Running Tests
-
-```bash
-# Placeholder for future test suite
-pytest
-```
+See `requirements.txt` for full dependency list and versions.
 
 ### Contributing
+This is a hackathon MVP. Future enhancements welcome:
+- Vector database integration for larger knowledge bases
+- Multi-model support (Llama 2, Mistral, etc.)
+- Batch processing for multiple projects
+- Export to CRA-standard formats
+- Fine-tuned models for SR&ED claims
+- Web deployment with sandboxed execution
 
-This is an MVP project. Contributions welcome after initial development phase.
+### Running Tests (Future)
+Comprehensive test suite planned for production version. Currently, manual testing recommended with real SR&ED claim scenarios.
+
+## 🗺️ Roadmap
+
+**v1.2 (Planned)**
+- [ ] CRA T661 form auto-fill integration
+- [ ] Export to Word/PDF with proper formatting
+- [ ] Multi-language support (French translations for Quebec)
+- [ ] Claim history persistence to local database
+
+**v2.0 (Future)**
+- [ ] Vector database for embedded knowledge base (RAG)
+- [ ] Fine-tuned model specifically for SR&ED claims
+- [ ] CRA technical guide references inline
+- [ ] Collaborative claims (team inputs, version control)
+- [ ] Professional claim review integration
+
+## 📄 License
+
+This project is provided as-is under the Apache License 2.0. See LICENSE file for details.
+
+## ⚠️ Disclaimer
+
+**SR&ED GPT is not a substitute for professional tax or legal advice.** 
+
+This tool is designed to:
+- ✅ Accelerate first-draft narrative generation
+- ✅ Ensure consistent SR&ED terminology
+- ✅ Reduce time spent on documentation
+
+It is **not** designed to:
+- ❌ Replace tax professionals or accountants
+- ❌ Guarantee CRA approval (claims require qualification review)
+- ❌ Provide legal advice
+- ❌ Substitute for proper project record-keeping
+
+**Always have generated narratives reviewed by a qualified tax professional or SR&ED claim preparer before submission to CRA.** The CRA reviews claims rigorously, and professional guidance significantly increases approval likelihood.
 
 ---
 
-## License
-
-Apache License 2.0 - See LICENSE file for details.
-
----
-
-## Disclaimer
-
-This tool generates **draft narratives only**. Always review and edit the output with a qualified SR&ED consultant before submission to the Canada Revenue Agency. The authors are not responsible for the accuracy or acceptance of claims generated by this tool.
-
----
-
-## License
-
-Apache License 2.0 - See LICENSE file for details.
+**Built with ❤️ as a hackathon MVP | Questions?** Open an issue on GitHub or reach out to the development team.

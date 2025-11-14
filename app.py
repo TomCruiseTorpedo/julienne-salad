@@ -146,10 +146,10 @@ QUALITY GUIDELINES:
         st.error(f"Error communicating with Ollama. Is the 'sred-expert' model running? Details: {e}")
         return ""
 
-def format_narrative_output(raw_output: str) -> tuple[str, str]:
+def format_narrative_output(raw_output: str) -> tuple[str, str, str]:
     """
     Splits the raw narrative into thinking process and formatted output.
-    Returns: (thinking_process, formatted_narrative)
+    Returns: (thinking_process, formatted_narrative, full_output_for_download)
     """
     # Split by the first occurrence of "## Line 242" to separate thinking from output
     lines = raw_output.split("\n")
@@ -172,7 +172,10 @@ def format_narrative_output(raw_output: str) -> tuple[str, str]:
     # Enhance formatting: add bullets and structure
     formatted_narrative = enhance_narrative_formatting(narrative_text)
     
-    return thinking_text, formatted_narrative
+    # Full output includes both thinking and narrative for download
+    full_output = f"=== AI THINKING PROCESS ===\n\n{thinking_text}\n\n=== TECHNICAL NARRATIVE FOR T661 FORM ===\n\n{formatted_narrative}"
+    
+    return thinking_text, formatted_narrative, full_output
 
 def enhance_narrative_formatting(narrative: str) -> str:
     """
@@ -317,21 +320,21 @@ with col1:
                     
                     if narrative_output:
                         # Split into thinking and narrative
-                        thinking_process, formatted_narrative = format_narrative_output(narrative_output)
+                        thinking_process, formatted_narrative, full_output_for_download = format_narrative_output(narrative_output)
                         
                         # Display thinking process in collapsible expander
                         with st.expander("🤔 View AI's Thinking Process"):
                             st.markdown(thinking_process)
                         
-                        # Display formatted narrative prominently
+                        # Display formatted narrative prominently (always visible, not in expander)
                         st.markdown("---")
-                        st.subheader("📋 SR&ED Narrative (Ready for CRA Submission)")
+                        st.subheader("📋 Technical Narrative for T661 Form")
                         st.markdown(formatted_narrative)
                         
-                        # Download button
+                        # Download button with full output (thinking + narrative)
                         st.download_button(
                             label="💾 Download Narrative",
-                            data=formatted_narrative,
+                            data=full_output_for_download,
                             file_name=f"sred_narrative_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
                             mime="text/plain"
                         )

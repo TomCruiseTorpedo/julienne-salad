@@ -1,0 +1,4 @@
+2024-10-05, 10:15 AM – Installed FPGA v2.3, adjusted clock speed, observed unexpected timing errors. Hypothesis: Bus voltage marginal, will run further tests.
+2024-10-05, 2:30 PM – Increased bus voltage, timing errors reduced by 80%. Documenting parameter ranges.
+2024-10-06, 9:00 AM – Reimplemented sorting algorithm, swapped heap-sort for quick-sort, benchmarked ~18% speedup on 8M records.
+2024-10-06, 2:00 PM – Quick-sort failed on synthetic worst-case input, exploring hybrid algorithm structure. Logged code changes in commit hash c193fd2e.

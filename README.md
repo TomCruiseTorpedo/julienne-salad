@@ -155,6 +155,116 @@ Each narrative output includes:
    - Implicit section mapping to Lines 242/244/246
    - Ready to copy-paste into CRA forms or claim documents
 
+## 📚 Real-World SR&ED Project Examples
+
+These examples demonstrate how to structure and frame work that qualifies for SR&ED under T661:
+
+### Example 1: Agri-Tech Automation Experiment
+
+**Uncertainty**: Could a novel humidity control mechanism stabilize rapidly changing greenhouse environments?
+
+**Work Performed**: 
+- Developed and trialed several control algorithms for humidity regulation
+- Modified hardware configurations to test different sensor combinations
+- Logged results from trials under variable environmental conditions
+- Systematically reviewed failure modes to identify instability factors
+
+**Advancement**: 
+The project clarified the instability factors affecting greenhouse automation, contributing new knowledge to the agri-tech climate control sector. The findings on humidity sensor response times and algorithm tuning parameters were novel for the organization and industry context.
+
+**T661 Alignment**: This work qualifies because it addresses a technological uncertainty, involved experimentation beyond routine troubleshooting, and resulted in new knowledge (even if the initial goal wasn't fully achieved).
+
+---
+
+### Example 2: Food Processing & Natural Preservative R&D
+
+**Uncertainty**: Would natural preservative alternatives maintain shelf life and safety under real-world pH variation?
+
+**Work Performed**:
+- Formulated experimental batches using natural alternatives to synthetic preservatives
+- Varied pH conditions to simulate real-world storage scenarios
+- Tracked spoilage indicators across multiple test conditions
+- Performed safety and stability tests on each formulation variant
+
+**Advancement**: 
+Negative results revealed critical formulation failure factors—specifically, that pH sensitivity was higher than expected and required reformulation approaches. These conclusions directly informed future product development cycles and contributed new understanding of natural preservative chemistry.
+
+**T661 Alignment**: SR&ED includes projects where the advancement comes from failed experiments. The negative results were valuable because they narrowed the solution space and identified specific technical barriers.
+
+---
+
+### Example 3: Manufacturing Alloy Development
+
+**Uncertainty**: Could new alloy compositions increase tool durability beyond existing commercial alloys under elevated temperature conditions?
+
+**Work Performed**:
+- Designed multiple prototype alloy compositions with varying nickel percentages
+- Manufactured test samples using controlled processes
+- Tested prototypes at progressively escalating temperatures to identify failure points
+- Documented results and thermal performance boundaries
+
+**Advancement**: 
+The testing discovered a technical limit to temperature resistance and documented the precise role of nickel percentage in durability. This information advanced sector knowledge by clarifying the relationship between composition and thermal performance—knowledge not previously available to the organization.
+
+**T661 Alignment**: This demonstrates experimental work addressing technological uncertainty, with advancement through systematic testing and documented findings that contribute to industry knowledge.
+
+---
+
+### Example 4: Software Algorithm Optimization
+
+**Uncertainty**: Could novel algorithms optimize large dataset sorting without the common performance bottlenecks of standard approaches?
+
+**Work Performed**:
+- Formulated a hypothesis about efficiency limits in current sorting algorithms
+- Coded and compared several algorithm variants (heap-sort, quick-sort, custom hybrid approaches)
+- Used a benchmarking dataset of 8+ million records for testing
+- Logged both successful optimizations and edge-case failures
+
+**Advancement**: 
+Identified the true maximum bottleneck (memory access patterns rather than computational complexity) and published a new algorithm approach that addressed this bottleneck. This advancement contributed new knowledge to the data engineering field.
+
+**T661 Alignment**: The iterative experimentation, failed approaches, specific benchmarking results, and novel algorithm publication all demonstrate SR&ED-eligible work.
+
+---
+
+## 📝 Work Log Best Practices
+
+### Recommended Format
+
+**Timestamp | Task | Result | Next Action**
+
+Work logs should capture the **what, how, and outcome** of technical activities in a way that demonstrates SR&ED-qualifying work:
+
+```
+2024-10-05, 10:15 AM | Installed FPGA v2.3, adjusted clock speed to 850MHz | Unexpected timing errors observed; hypothesis: bus voltage marginal | Run voltage stress tests at multiple levels
+2024-10-05, 2:30 PM | Increased bus voltage to 3.3V, re-ran timing tests | Timing errors reduced by 80%; margin now acceptable | Document voltage/performance relationship; test thermal stability
+2024-10-06, 9:00 AM | Reimplemented sorting algorithm, swapped heap-sort for quick-sort variant | Benchmarked ~18% speedup on 8M record dataset | Test edge cases; evaluate memory usage vs. speed tradeoff
+2024-10-06, 2:00 PM | Ran quick-sort variant against synthetic worst-case inputs | Algorithm failed on pathological case; reverted to hybrid approach | Analyze worst-case behavior; implement adaptive partitioning
+```
+
+### Key Guidelines for SR&ED-Compliant Work Logs
+
+1. **Log in Real-Time**: Update logs as work progresses, not reconstructed days later. This shows genuine experimentation and troubleshooting.
+
+2. **Show All Iterations**: Include failed attempts, not just successes. SR&ED values the problem-solving journey, including dead ends.
+
+3. **Reference Specific Changes**: Don't say "optimized the algorithm." Instead: "Adjusted layer depth from 3 to 5 and swapped sigmoid for ReLU activation, achieving +12% accuracy on validation set."
+
+4. **Document Failure Modes**: When something doesn't work, explain why and what you learned. This demonstrates technical depth.
+
+5. **Link to Assets**: Reference git commits (e.g., "Implemented changes in commit c193fd2e"), Jira tickets, spreadsheets, or branch names. This creates an auditable trail.
+
+### Why This Matters
+
+CRA auditors reviewing SR&ED claims look for evidence of:
+- Genuine technological uncertainty being investigated
+- Systematic experimentation and iteration
+- Technical decisions made and their rationales
+- Learning from failures
+- Advancing knowledge, even if initial goals weren't met
+
+Well-structured work logs provide exactly this evidence.
+
 ## ⚙️ Advanced Features
 
 ### Customization via Prompts

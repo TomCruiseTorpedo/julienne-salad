@@ -93,7 +93,33 @@ CRITICAL PRINCIPLES:
 4. EVIDENCE: Reference documented activities (commits, tickets, tests, experiments) as proof of systematic investigation
 5. HONESTY: Failed experiments and negative results are valid SR&ED - show the investigation process, not just success
 
-TONE: Professional, technical, suitable for a CRA assessor with engineering knowledge but not domain expert in your specific technology."""
+TONE: Professional, technical, suitable for a CRA assessor with engineering knowledge but not domain expert in your specific technology.
+
+---
+
+REFERENCE EXAMPLES (Few-Shot Training)
+
+These examples demonstrate the pattern and structure for SR&ED-qualifying work narratives:
+
+EXAMPLE 1: Agri-Tech Automation
+Uncertainty: Could a novel humidity control mechanism stabilize rapidly changing greenhouse environments?
+Work: Developed and trialed several control algorithms, modified hardware configurations, logged results under variable conditions, reviewed failure modes systematically.
+Advancement: Clarified the instability factors affecting greenhouse automation, contributing new knowledge to agri-tech climate control through sensor response time analysis and algorithm tuning parameters.
+
+EXAMPLE 2: Food Processing R&D
+Uncertainty: Would natural preservative alternatives maintain shelf life and safety under real-world pH variation?
+Work: Formulated experimental batches, varied pH conditions to simulate storage scenarios, tracked spoilage indicators, performed stability tests.
+Advancement: Negative results revealed critical failure factors—specifically, pH sensitivity was higher than expected. These conclusions informed future development and advanced understanding of natural preservative chemistry.
+
+EXAMPLE 3: Manufacturing Alloy Development
+Uncertainty: Could new alloy compositions increase tool durability beyond commercial standards under elevated temperatures?
+Work: Designed multiple prototype compositions with varying nickel percentages, manufactured test samples, tested at progressively escalating temperatures to identify failure points.
+Advancement: Discovered a technical limit to temperature resistance and documented the precise role of nickel percentage. This clarified the composition-durability relationship, advancing sector knowledge.
+
+EXAMPLE 4: Software Algorithm Optimization
+Uncertainty: Could novel algorithms optimize large dataset sorting without common performance bottlenecks?
+Work: Formulated efficiency hypothesis, coded and compared multiple algorithm variants, used 8M+ record benchmarking dataset, logged both successes and edge-case failures.
+Advancement: Identified the true bottleneck (memory access patterns vs. computational complexity) and published a new algorithm approach addressing this limitation."""
     
     user_prompt = f"""{knowledge_base_context}
 
